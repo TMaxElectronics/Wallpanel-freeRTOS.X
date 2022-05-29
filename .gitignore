@@ -21,3 +21,5 @@ funclist
 nbproject/Makefile-*
 disassembly/
 *.map
+**/flags/default/*
+.generated_files/**
