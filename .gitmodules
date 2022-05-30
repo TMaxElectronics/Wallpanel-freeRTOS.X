@@ -1,9 +1,6 @@
 [submodule "TTerm"]
 	path = TTerm
 	url = https://github.com/TMaxElectronics/TTerm.git
-[submodule "drivers/Pic32FastSd"]
-	path = drivers/Pic32FastSd
-	url = http://github.com/TMaxElectronics/Pic32FastSd.git
 [submodule "drivers/Pic32Uart"]
 	path = drivers/Pic32Uart
 	url = http://github.com/TMaxElectronics/Pic32Uart.git
@@ -16,3 +13,6 @@
 [submodule "drivers/Pic32DMA"]
 	path = drivers/Pic32DMA
 	url = http://github.com/TMaxElectronics/Pic32DMA.git
+[submodule "drivers/Pic32FastSd"]
+	path = drivers/Pic32FastSd
+	url = http://github.com/TMaxElectronics/Pic32FastSd.git
