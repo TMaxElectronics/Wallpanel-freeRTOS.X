@@ -1,6 +1,7 @@
 #include <xc.h>
 #include <stdint.h>
 #include <string.h>
+#include <sys/kmem.h>
 
 #include "FreeRTOSConfig.h"
 #include "System.h"
@@ -8,6 +9,7 @@
 #include "stream_buffer.h"
 #include "TTerm.h"
 #include "UART.h"
+#include "sys/attribs.h"
 
 const char SYS_fullBar[] = "=======================================================";
 const char SYS_emptyBar[] = "-------------------------------------------------------";
@@ -22,14 +24,28 @@ void SYS_waitCP0(uint16_t length){
     while(_CP0_GET_COUNT() < targetTime);
 }
 
+//move a variable to the non cachable section of ram
+uint32_t * SYS_makeCoherent(uint32_t * nonCoherent){
+    //make sure variable is in non coherent ram, else return NULL
+    if(nonCoherent < __KSEG0_DATA_MEM_BASE || nonCoherent >= __KSEG0_DATA_MEM_BASE + __KSEG0_DATA_MEM_LENGTH) return NULL;
+    return KVA0_TO_KVA1(nonCoherent);
+}
+
+//move a variable to the cachable section of ram
+uint32_t * SYS_makeNonCoherent(uint32_t * coherent){
+    //make sure variable is in non coherent ram, else return NULL
+    if(coherent < KVA1_TO_KVA0(__KSEG0_DATA_MEM_BASE) || coherent >= KVA1_TO_KVA0(__KSEG0_DATA_MEM_BASE) + __KSEG0_DATA_MEM_LENGTH) return NULL;
+    return KVA1_TO_KVA0(coherent);
+}
+
 uint32_t SYS_getCPULoadFine(TaskStatus_t * taskStats, uint32_t taskCount, uint32_t sysTime){
     uint32_t currTask = 0;
     volatile TaskStatus_t * ct = &taskStats[0];
     for(;currTask < taskCount; currTask++){
         ct = &taskStats[currTask];
-        configASSERT(ct > 0xa0000000 && ct < 0xa0010000);
+        //configASSERT(ct > 0xa0000000 && ct < 0xa0010000);
         if(strncmp(taskStats[currTask].pcTaskName, "IDLE", configMAX_TASK_NAME_LEN) == 0){
-            return configTICK_RATE_HZ - ((taskStats[currTask].ulRunTimeCounter) / (sysTime/configTICK_RATE_HZ));
+            return 1000 - taskStats[currTask].avgCPULoad;
         }
     }
     return -1;

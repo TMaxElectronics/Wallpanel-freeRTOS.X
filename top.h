@@ -1,6 +1,7 @@
 /*
- * FreeRTOS Kernel V10.4.1
- * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * TTerm
+ *
+ * Copyright (c) 2020 Thorben Zethoff, Jens Kerrinnes
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -18,19 +19,13 @@
  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- * http://www.FreeRTOS.org
- * http://aws.amazon.com/freertos
- *
- * 1 tab == 4 spaces!
- */
+*/
 
-#ifndef FLOP_TASKS_H
-#define FLOP_TASKS_H
+#if !defined(app_top_H)
+#define app_top_H
 
-void vStartMathTasks( unsigned portBASE_TYPE uxPriority );
-portBASE_TYPE xAreMathsTaskStillRunning( void );
+#include "TTerm.h"
+
+uint8_t REGISTER_top(TermCommandDescriptor * desc);
 
 #endif
-
-

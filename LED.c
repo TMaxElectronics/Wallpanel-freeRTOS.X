@@ -90,44 +90,36 @@ void LED_ethDHCPStateChangeHook(unsigned newState){
 
 void LED_ethPacketReceivedHook(){
     ethLEDTime = LED_BLINK_TIME;
-    LATBINV = _LATB_LATB2_MASK;
 }
 
 void LED_minPacketReceivedHook(){
     minLEDTime = LED_BLINK_TIME;
-    LATAINV = _LATA_LATA2_MASK;
 }
 
 void LED_errorFlashHook(){
     errLEDTime = LED_BLINK_TIME;
-    LATBCLR = _LATB_LATB3_MASK;
-    LATASET = _LATA_LATA2_MASK;
-    LATBSET = _LATB_LATB2_MASK;
 }
 
 void LED_showCode(uint8_t * code){
-    while(1);
     uint8_t currentPos = 0;
     
     //turn off all LEDs
-    LATASET = _LATA_LATA2_MASK;
-    LATBSET = _LATB_LATB2_MASK;
-    LATBSET = _LATB_LATB3_MASK;
+    LATASET = _LATA_LATA6_MASK;
     
     //allows the debugger to skip out of this loop if desired
     unsigned cont = 1;
     while(cont){
         switch(code[currentPos]){
             case 0:     //short flash
-                LATBSET = _LATB_LATB0_MASK;
+                LATASET = _LATA_LATA6_MASK;
                 SYS_waitCP0(LED_CODE_0_TIME);
-                LATBCLR = _LATB_LATB0_MASK;
+                LATACLR = _LATA_LATA6_MASK;
                 break;
                 
             case 1:     //long flash
-                LATBSET = _LATB_LATB0_MASK;
+                LATASET = _LATA_LATA6_MASK;
                 SYS_waitCP0(LED_CODE_1_TIME);
-                LATBCLR = _LATB_LATB0_MASK;
+                LATACLR = _LATA_LATA6_MASK;
                 break;
                 
             case 0xfe:  //inter-character pause

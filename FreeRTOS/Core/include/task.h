@@ -154,6 +154,9 @@ typedef struct xTASK_STATUS
     StackType_t * pxStackBase;                       /* Points to the lowest address of the task's stack area. */
     configSTACK_DEPTH_TYPE usStackHighWaterMark;     /* The minimum amount of stack space that has remained for the task since the task was created.  The closer this value is to zero the closer the task has come to overflowing its stack. */
     uint32_t usedHeap;
+    uint32_t avgCPULoad;
+    uint32_t currCPULoad;
+    uint32_t iCount;
 } TaskStatus_t;
 
 /* Possible return values for eTaskConfirmSleepModeStatus(). */

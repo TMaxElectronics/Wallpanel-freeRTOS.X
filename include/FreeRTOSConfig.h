@@ -28,7 +28,7 @@
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
-#include <p32xxxx.h>
+#include <xc.h>
 
 /*-----------------------------------------------------------
  * Application specific definitions.
@@ -37,28 +37,29 @@
  * application requirements.
  *
  * THESE PARAMETERS ARE DESCRIBED WITHIN THE 'CONFIGURATION' SECTION OF THE
- * FreeRTOS API DOCUMENTATION AVAILABLE ON THE FreeRTOS.org WEB SITE. 
+ * FreeRTOS API DOCUMENTATION AVAILABLE ON THE FreeRTOS.org WEB SITE.
  *
  * See http://www.freertos.org/a00110.html
  *----------------------------------------------------------*/
 
 #define configUSE_PREEMPTION					1
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION	1
+#define configUSE_QUEUE_SETS					1
 #define configUSE_IDLE_HOOK						0
-#define configUSE_TICK_HOOK						0
+#define configUSE_TICK_HOOK						1
 #define configTICK_RATE_HZ						( ( TickType_t ) 1000 )
-#define configCPU_CLOCK_HZ						( 48000000UL )
-#define configPERIPHERAL_CLOCK_HZ				( 48000000UL )
+#define configCPU_CLOCK_HZ						( 200000000UL )
+#define configPERIPHERAL_CLOCK_HZ				( 40000000UL )
 #define configMAX_PRIORITIES					( 5UL )
-#define configMINIMAL_STACK_SIZE				( 125 )
-#define configISR_STACK_SIZE					( 250 )
-#define configTOTAL_HEAP_SIZE					( ( size_t ) 55000 )
-#define configMAX_TASK_NAME_LEN					( 16 )
+#define configMINIMAL_STACK_SIZE				( 190 )
+#define configISR_STACK_SIZE					( 400 )
+#define configTOTAL_HEAP_SIZE					( ( size_t ) 250000 )
+#define configMAX_TASK_NAME_LEN					( 32 )
 #define configUSE_TRACE_FACILITY				1
 #define configUSE_16_BIT_TICKS					0
 #define configIDLE_SHOULD_YIELD					1
 #define configUSE_MUTEXES						1
-#define configCHECK_FOR_STACK_OVERFLOW			3
+#define configCHECK_FOR_STACK_OVERFLOW			3 /* Three also checks the system/interrupt stack. */
 #define configQUEUE_REGISTRY_SIZE				0
 #define configUSE_RECURSIVE_MUTEXES				1
 #define configUSE_MALLOC_FAILED_HOOK			1
@@ -66,29 +67,38 @@
 #define configUSE_COUNTING_SEMAPHORES			1
 #define configGENERATE_RUN_TIME_STATS			1
 #define configTRACK_HEAP_USAGE                  1
+#define configTRACK_CPU_USAGE                   1
+
+/* Enable support for Task based FPU operations. This will enable support for
+FPU context saving during switches only on architectures with hardware FPU.
+
+NOTE: This constant is defined in the project options as configurations are 
+provided that both enable and disable floating point support. 
+#define configUSE_TASK_FPU_SUPPORT				0 */
 
 /* Co-routine definitions. */
-#define configUSE_CO_ROUTINES 			0
-#define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
+#define configUSE_CO_ROUTINES					0
+#define configMAX_CO_ROUTINE_PRIORITIES			( 2 )
 
 /* Software timer definitions. */
-#define configUSE_TIMERS				1
-#define configTIMER_TASK_PRIORITY		( 2 )
-#define configTIMER_QUEUE_LENGTH		5
-#define configTIMER_TASK_STACK_DEPTH	( configMINIMAL_STACK_SIZE * 2 )
+#define configUSE_TIMERS						1
+#define configTIMER_TASK_PRIORITY				( 2 )
+#define configTIMER_QUEUE_LENGTH				5
+#define configTIMER_TASK_STACK_DEPTH			( configMINIMAL_STACK_SIZE * 2 )
 
 /* Set the following definitions to 1 to include the API function, or zero
 to exclude the API function. */
 
-#define INCLUDE_vTaskPrioritySet			1
-#define INCLUDE_uxTaskPriorityGet			1
-#define INCLUDE_vTaskDelete					1
-#define INCLUDE_vTaskCleanUpResources		0
-#define INCLUDE_vTaskSuspend				1
-#define INCLUDE_vTaskDelayUntil				1
-#define INCLUDE_vTaskDelay					1
-#define INCLUDE_uxTaskGetStackHighWaterMark	1
-#define INCLUDE_eTaskGetState				1
+#define INCLUDE_vTaskPrioritySet				1
+#define INCLUDE_uxTaskPriorityGet				1
+#define INCLUDE_vTaskDelete						1
+#define INCLUDE_vTaskCleanUpResources			0
+#define INCLUDE_vTaskSuspend					1
+#define INCLUDE_vTaskDelayUntil					1
+#define INCLUDE_vTaskDelay						1
+#define INCLUDE_uxTaskGetStackHighWaterMark		1
+#define INCLUDE_eTaskGetState					1
+#define INCLUDE_xTimerPendFunctionCall			1
 
 /* Prevent C specific syntax being included in assembly files. */
 #ifndef __LANGUAGE_ASSEMBLY
@@ -109,10 +119,10 @@ kept at 1. */
 /* The maximum interrupt priority from which FreeRTOS.org API functions can
 be called.  Only API functions that end in ...FromISR() can be used within
 interrupts. */
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY	0x04
-    
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY	0x03
+
 #define portGET_RUN_TIME_COUNTER_VALUE()	((TMR5 << 16) | TMR4)
+#define portGET_INSTRUCTION_COUNTER_VALUE()	_CP0_GET_COUNT()//((TMR5 << 16) | TMR4)
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()	
-
-
+    
 #endif /* FREERTOS_CONFIG_H */

@@ -267,6 +267,13 @@ typedef struct tskTaskControlBlock       /* The old naming convention is used to
     #if ( configTRACK_HEAP_USAGE == 1 )
     int32_t ulUsedHeap;
     #endif
+
+    #if ( configTRACK_CPU_USAGE == 1 )
+    int32_t ulAvgCPULoad;
+    int32_t ulCurrentCPULoad;
+    int32_t ulLastCalculationTick;
+    int32_t ulInstructionsThisTick;
+    #endif
         
     #if ( ( portSTACK_GROWTH > 0 ) || ( configRECORD_STACK_HIGH_ADDRESS == 1 ) )
         StackType_t * pxEndOfStack; /*< Points to the highest valid address for the stack. */
@@ -404,6 +411,14 @@ PRIVILEGED_DATA static volatile UBaseType_t uxSchedulerSuspended = ( UBaseType_t
  * code working with debuggers that need to remove the static qualifier. */
     PRIVILEGED_DATA static uint32_t ulTaskSwitchedInTime = 0UL;    /*< Holds the value of a timer/counter the last time a task was switched in. */
     PRIVILEGED_DATA static volatile uint32_t ulTotalRunTime = 0UL; /*< Holds the total amount of execution time as defined by the run time counter clock. */
+
+#endif
+
+#if ( configTRACK_CPU_USAGE == 1 )
+
+    PRIVILEGED_DATA static uint32_t ulTaskInstructionCountStart = 0UL;    /*< Holds the value of a timer/counter the last time a task was switched in. */
+    PRIVILEGED_DATA static uint32_t ulInstructionCountStart = 0UL;    /*< Holds the value of a timer/counter the last time a task was switched in. */
+    PRIVILEGED_DATA static uint32_t ulInstuctionCountLastTick = 0UL;    /*< Holds the value of a timer/counter the last time a task was switched in. */
 
 #endif
 
@@ -968,6 +983,14 @@ static void prvInitialiseNewTask( TaskFunction_t pxTaskCode,
     #if ( configTRACK_HEAP_USAGE == 1 )
         {
         pxNewTCB->ulUsedHeap = 0UL;
+        }
+    #endif
+
+    #if ( configTRACK_CPU_USAGE == 1 )
+        {
+        pxNewTCB->ulCurrentCPULoad = 0UL;
+        pxNewTCB->ulAvgCPULoad = 0UL;
+        pxNewTCB->ulInstructionsThisTick = 0UL;
         }
     #endif
 
@@ -2734,6 +2757,12 @@ BaseType_t xTaskCatchUpTicks( TickType_t xTicksToCatchUp )
 
 BaseType_t xTaskIncrementTick( void )
 {
+    #if ( configTRACK_CPU_USAGE == 1 )
+        //calculate accurate tick-duration in executed instructions, done as soon as possible for accuracy reasons
+        ulInstuctionCountLastTick = portGET_INSTRUCTION_COUNTER_VALUE() - ulInstructionCountStart;
+        ulInstructionCountStart = portGET_INSTRUCTION_COUNTER_VALUE();
+    #endif
+
     TCB_t * pxTCB;
     TickType_t xItemValue;
     BaseType_t xSwitchRequired = pdFALSE;
@@ -3037,7 +3066,30 @@ void vTaskSwitchContext( void )
                 #else
                     ulTotalRunTime = portGET_RUN_TIME_COUNTER_VALUE();
                 #endif
-
+                
+                #if configTRACK_CPU_USAGE == 1
+                    uint32_t ulTicksSinceLastCalculation = xTickCount - pxCurrentTCB->ulLastCalculationTick;
+                    
+                    if(ulTicksSinceLastCalculation > 0){       //task was last executed last tick => we need to calculate the load based on the count
+                        pxCurrentTCB->ulCurrentCPULoad = (pxCurrentTCB->ulInstructionsThisTick * 1000) / (ulInstuctionCountLastTick * ulTicksSinceLastCalculation);
+                        pxCurrentTCB->ulAvgCPULoad = ((63 * pxCurrentTCB->ulAvgCPULoad) + pxCurrentTCB->ulCurrentCPULoad) >> 6;
+                        if(pxCurrentTCB->pcTaskName[0] != 'I' && pxCurrentTCB->ulCurrentCPULoad > 100){
+                            pxCurrentTCB->ulInstructionsThisTick = 1337;
+                        }
+                        pxCurrentTCB->ulInstructionsThisTick = 0;
+                    }
+                    
+                    pxCurrentTCB->ulLastCalculationTick = xTickCount;
+                    
+                    if( portGET_INSTRUCTION_COUNTER_VALUE() > ulTaskInstructionCountStart )
+                    {
+                        pxCurrentTCB->ulInstructionsThisTick += ( portGET_INSTRUCTION_COUNTER_VALUE() - ulTaskInstructionCountStart );
+                    }
+                    
+                    
+                    ulTaskInstructionCountStart = portGET_INSTRUCTION_COUNTER_VALUE();
+                #endif
+                    
                 /* Add the amount of time the task has been running to the
                  * accumulated time so far.  The time the task started running was
                  * stored in ulTaskSwitchedInTime.  Note that there is no overflow
@@ -3747,8 +3799,14 @@ static void prvCheckTasksWaitingTermination( void )
         pxTaskStatus->uxCurrentPriority = pxTCB->uxPriority;
         pxTaskStatus->pxStackBase = pxTCB->pxStack;
         pxTaskStatus->xTaskNumber = pxTCB->uxTCBNumber;
-        #if configTRACK_HEAP_USAGE
+        #if configTRACK_HEAP_USAGE == 1
         pxTaskStatus->usedHeap = pxTCB->ulUsedHeap;
+        #endif
+
+        #if configTRACK_CPU_USAGE == 1
+        pxTaskStatus->avgCPULoad = pxTCB->ulAvgCPULoad;
+        pxTaskStatus->currCPULoad = pxTCB->ulCurrentCPULoad;
+        pxTaskStatus->iCount = pxTCB->ulInstructionsThisTick;
         #endif
         
         #if ( configUSE_MUTEXES == 1 )

@@ -14,6 +14,8 @@
 #include "startup.h"
 #include "System.h"
 #include "SerialComms.h"
+#include "FS.h"
+#include "SPI.h"
 
 unsigned deviceReady = 0;
 static void startupTask();
@@ -31,8 +33,10 @@ void startServices(){
     
     TERM_addCommand(CMD_getBLState, "getBLState", "shows the last bootloader exit code", 0, &TERM_defaultList);
     
+    SPI_HANDLE * sdCardHandle = SPI_createHandle(2);
+    SPI_init(sdCardHandle, &RPB3R, 0b0101, 5, 400000);
     //create the FS task. (checks for SD card connection/removal)
-    //xTaskCreate(FS_task, "fs Task", configMINIMAL_STACK_SIZE + 400, NULL , tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(FS_task, "fs Task", configMINIMAL_STACK_SIZE + 400, sdCardHandle , tskIDLE_PRIORITY + 1, NULL);
     //TODO optimize stack usage and figure out why it needs to be this large
     
     SCOM_init();
@@ -91,6 +95,11 @@ static void prvSetupHardware(){
     CNPUASET = _TRISA_TRISA7_MASK;
     CNPUBSET = _TRISB_TRISB0_MASK;
     CNPUGSET = _TRISG_TRISG12_MASK | _TRISG_TRISG13_MASK | _TRISG_TRISG14_MASK | _TRISG_TRISG15_MASK;
+    
+    T4CON = 0b1000000001111000;
+    T5CON = 0b1000000001111000;
+    
+    DMACON = _DMACON_ON_MASK;
 }
 
 static uint8_t CMD_getBLState(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){

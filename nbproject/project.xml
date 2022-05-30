@@ -19,6 +19,18 @@
                 <sourceRootElem>FreeRTOS/Full</sourceRootElem>
                 <sourceRootElem>FreeRTOS/Core/include</sourceRootElem>
                 <sourceRootElem>TTerm</sourceRootElem>
+                <sourceRootElem>TTerm/Core</sourceRootElem>
+                <sourceRootElem>TTerm/Core/include</sourceRootElem>
+                <sourceRootElem>RTOSFs</sourceRootElem>
+                <sourceRootElem>RTOSFs/include</sourceRootElem>
+                <sourceRootElem>drivers/Pic32FastSd</sourceRootElem>
+                <sourceRootElem>drivers/Pic32FastSd/include</sourceRootElem>
+                <sourceRootElem>drivers/Pic32Spi</sourceRootElem>
+                <sourceRootElem>drivers/Pic32Spi/include</sourceRootElem>
+                <sourceRootElem>drivers/Pic32Uart</sourceRootElem>
+                <sourceRootElem>drivers/Pic32Uart/include</sourceRootElem>
+                <sourceRootElem>drivers/Pic32DMA</sourceRootElem>
+                <sourceRootElem>drivers/Pic32DMA/include</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>
