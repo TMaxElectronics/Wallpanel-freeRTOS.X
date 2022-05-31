@@ -51,7 +51,7 @@
           <itemPath>FreeRTOS/Core/portable/MPLAB/PIC32MZ/ISR_Support.h</itemPath>
           <itemPath>FreeRTOS/Core/portable/MPLAB/PIC32MZ/portmacro.h</itemPath>
         </logicalFolder>
-        <itemPath>FreeRTOSConfig.h</itemPath>
+        <itemPath>include/FreeRTOSConfig.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName=".TTerm" projectFiles="true">
         <logicalFolder name="f1" displayName="Core" projectFiles="true">
@@ -222,7 +222,7 @@
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="false"/>
         <property key="make-warnings-into-errors" value="false"/>
-        <property key="optimization-level" value="-Os"/>
+        <property key="optimization-level" value=""/>
         <property key="place-data-into-section" value="false"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
@@ -721,8 +721,36 @@
         <property key="voltagevalue" value="3.25"/>
       </Tool>
       <item path="drivers/Pic32Uart/include/printf.h" ex="true" overriding="false">
+        <C32>
+        </C32>
+        <C32-AR>
+        </C32-AR>
+        <C32-AS>
+        </C32-AS>
+        <C32-CO>
+        </C32-CO>
+        <C32-LD>
+        </C32-LD>
+        <C32CPP>
+        </C32CPP>
+        <C32Global>
+        </C32Global>
       </item>
       <item path="drivers/Pic32Uart/printf.c" ex="true" overriding="false">
+        <C32>
+        </C32>
+        <C32-AR>
+        </C32-AR>
+        <C32-AS>
+        </C32-AS>
+        <C32-CO>
+        </C32-CO>
+        <C32-LD>
+        </C32-LD>
+        <C32CPP>
+        </C32CPP>
+        <C32Global>
+        </C32Global>
       </item>
       <pk4hybrid>
         <property key="ADC" value="true"/>
@@ -821,8 +849,6 @@
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="1d000000-1d0fffff"/>
         <property key="poweroptions.powerenable" value="false"/>
-        <property key="programmerToGoFilePath"
-                  value="C:/Users/Thorb/OneDrive/MPLab Projects/Wallpanel freeRTOS.X/debug/default/Wallpanel freeRTOS_ptg"/>
         <property key="programmerToGoImageName" value="Wallpanel freeRTOS_ptg"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>

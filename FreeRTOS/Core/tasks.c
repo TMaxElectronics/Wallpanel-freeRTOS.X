@@ -269,10 +269,12 @@ typedef struct tskTaskControlBlock       /* The old naming convention is used to
     #endif
 
     #if ( configTRACK_CPU_USAGE == 1 )
-    int32_t ulAvgCPULoad;
-    int32_t ulCurrentCPULoad;
-    int32_t ulLastCalculationTick;
-    int32_t ulInstructionsThisTick;
+    uint32_t ulAvgCPULoad;
+    uint32_t ulCurrentCPULoad;
+    uint32_t ulInstructionsThisCycle;
+    uint32_t ulInstructionsLastCycle;
+    uint32_t ulInstructionsAtLastLoadCalculation;
+    uint32_t ulTotalInstructionCount;
     #endif
         
     #if ( ( portSTACK_GROWTH > 0 ) || ( configRECORD_STACK_HIGH_ADDRESS == 1 ) )
@@ -990,7 +992,8 @@ static void prvInitialiseNewTask( TaskFunction_t pxTaskCode,
         {
         pxNewTCB->ulCurrentCPULoad = 0UL;
         pxNewTCB->ulAvgCPULoad = 0UL;
-        pxNewTCB->ulInstructionsThisTick = 0UL;
+        pxNewTCB->ulInstructionsThisCycle = 0UL;
+        pxNewTCB->ulInstructionsAtLastLoadCalculation = 0UL;
         }
     #endif
 
@@ -3068,24 +3071,9 @@ void vTaskSwitchContext( void )
                 #endif
                 
                 #if configTRACK_CPU_USAGE == 1
-                    uint32_t ulTicksSinceLastCalculation = xTickCount - pxCurrentTCB->ulLastCalculationTick;
                     
-                    if(ulTicksSinceLastCalculation > 0){       //task was last executed last tick => we need to calculate the load based on the count
-                        pxCurrentTCB->ulCurrentCPULoad = (pxCurrentTCB->ulInstructionsThisTick * 1000) / (ulInstuctionCountLastTick * ulTicksSinceLastCalculation);
-                        pxCurrentTCB->ulAvgCPULoad = ((63 * pxCurrentTCB->ulAvgCPULoad) + pxCurrentTCB->ulCurrentCPULoad) >> 6;
-                        if(pxCurrentTCB->pcTaskName[0] != 'I' && pxCurrentTCB->ulCurrentCPULoad > 100){
-                            pxCurrentTCB->ulInstructionsThisTick = 1337;
-                        }
-                        pxCurrentTCB->ulInstructionsThisTick = 0;
-                    }
-                    
-                    pxCurrentTCB->ulLastCalculationTick = xTickCount;
-                    
-                    if( portGET_INSTRUCTION_COUNTER_VALUE() > ulTaskInstructionCountStart )
-                    {
-                        pxCurrentTCB->ulInstructionsThisTick += ( portGET_INSTRUCTION_COUNTER_VALUE() - ulTaskInstructionCountStart );
-                    }
-                    
+                    pxCurrentTCB->ulInstructionsThisCycle += (uint32_t) ((uint32_t) portGET_INSTRUCTION_COUNTER_VALUE() - (uint32_t) ulTaskInstructionCountStart);
+                    pxCurrentTCB->ulTotalInstructionCount += (uint32_t) ((uint32_t) portGET_INSTRUCTION_COUNTER_VALUE() - (uint32_t) ulTaskInstructionCountStart);
                     
                     ulTaskInstructionCountStart = portGET_INSTRUCTION_COUNTER_VALUE();
                 #endif
@@ -3143,6 +3131,84 @@ void vTaskSwitchContext( void )
         #endif /* configUSE_NEWLIB_REENTRANT */
     }
 }
+
+#if configTRACK_CPU_USAGE == 1
+void vTaskDoCPULoadCalculationLoop()
+{
+    UBaseType_t uxQueue = configMAX_PRIORITIES;
+
+    vTaskSuspendAll();
+    
+    do
+    {
+        uxQueue--;
+        vTasklistCalculateCPULoad(&( pxReadyTasksLists[ uxQueue ] ), eReady );
+    } while( uxQueue > ( UBaseType_t ) tskIDLE_PRIORITY ); /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
+
+    /* Fill in an TaskStatus_t structure with information on each
+     * task in the Blocked state. */
+    vTasklistCalculateCPULoad(( List_t * ) pxDelayedTaskList, eBlocked );
+    vTasklistCalculateCPULoad(( List_t * ) pxOverflowDelayedTaskList, eBlocked );
+
+    #if ( INCLUDE_vTaskDelete == 1 )
+        {
+            /* Fill in an TaskStatus_t structure with information on
+             * each task that has been deleted but not yet cleaned up. */
+            vTasklistCalculateCPULoad(&xTasksWaitingTermination, eDeleted );
+        }
+    #endif
+
+    #if ( INCLUDE_vTaskSuspend == 1 )
+        {
+            /* Fill in an TaskStatus_t structure with information on
+             * each task in the Suspended state. */
+            vTasklistCalculateCPULoad(&xSuspendedTaskList, eSuspended );
+        }
+    #endif
+
+    ( void ) xTaskResumeAll();
+}
+
+void vTasklistCalculateCPULoad( List_t * pxList,
+                                eTaskState eState)
+{
+    configLIST_VOLATILE TCB_t * pxNextTCB, * pxFirstTCB;
+    UBaseType_t uxTask = 0;
+
+    if( listCURRENT_LIST_LENGTH( pxList ) > ( UBaseType_t ) 0 )
+    {
+        listGET_OWNER_OF_NEXT_ENTRY( pxFirstTCB, pxList ); /*lint !e9079 void * is used as this macro is used with timers and co-routines too.  Alignment is known to be fine as the type of the pointer stored and retrieved is the same. */
+
+        /* run the CPU Load calculation for each task */
+        do
+        {
+            //get next taskHandle
+            listGET_OWNER_OF_NEXT_ENTRY( pxNextTCB, pxList ); /*lint !e9079 void * is used as this macro is used with timers and co-routines too.  Alignment is known to be fine as the type of the pointer stored and retrieved is the same. */
+            TaskHandle_t pvCurrTaskHandle = ( TaskHandle_t ) pxNextTCB;
+
+            //calculate total number of instructions since last calculation of load
+            uint32_t ulInstructionsSinceLastTick = portGET_INSTRUCTION_COUNTER_VALUE() - pvCurrTaskHandle->ulInstructionsAtLastLoadCalculation;
+
+            //calculate load as load=instructionsThisTask / totalInstructionsExecuted
+            uint32_t ulCpuLoad = (pvCurrTaskHandle->ulInstructionsThisCycle) / (ulInstructionsSinceLastTick / 1000);
+
+            //write to TCB
+            pvCurrTaskHandle->ulAvgCPULoad            = (pvCurrTaskHandle->ulAvgCPULoad + ulCpuLoad) >> 1;
+            pvCurrTaskHandle->ulCurrentCPULoad        = ulCpuLoad;
+            pvCurrTaskHandle->ulInstructionsLastCycle = pvCurrTaskHandle->ulInstructionsThisCycle;
+            
+            pvCurrTaskHandle->ulInstructionsThisCycle = 0;
+
+            //reset total counter
+            pvCurrTaskHandle->ulInstructionsAtLastLoadCalculation = portGET_INSTRUCTION_COUNTER_VALUE();
+        } while( pxNextTCB != pxFirstTCB );
+    }
+    else
+    {
+        mtCOVERAGE_TEST_MARKER();
+    }
+}
+#endif
 /*-----------------------------------------------------------*/
 #if ( configTRACK_HEAP_USAGE == 1 )
 void vTaskMallocTrackHeapUsage(TaskHandle_t handle, uint32_t ulBytesUsed){
@@ -3806,7 +3872,11 @@ static void prvCheckTasksWaitingTermination( void )
         #if configTRACK_CPU_USAGE == 1
         pxTaskStatus->avgCPULoad = pxTCB->ulAvgCPULoad;
         pxTaskStatus->currCPULoad = pxTCB->ulCurrentCPULoad;
-        pxTaskStatus->iCount = pxTCB->ulInstructionsThisTick;
+        pxTaskStatus->iCount = pxTCB->ulInstructionsThisCycle;
+        pxTaskStatus->iCountLast = pxTCB->ulInstructionsAtLastLoadCalculation;
+        pxTaskStatus->iCountLastPC = pxTCB->ulInstructionsLastCycle;
+        
+        pxTaskStatus->ulTotalInstructionCount = pxTCB->ulTotalInstructionCount;
         #endif
         
         #if ( configUSE_MUTEXES == 1 )

@@ -156,7 +156,10 @@ typedef struct xTASK_STATUS
     uint32_t usedHeap;
     uint32_t avgCPULoad;
     uint32_t currCPULoad;
+    uint32_t ulTotalInstructionCount;
     uint32_t iCount;
+    uint32_t iCountLast;
+    uint32_t iCountLastPC;
 } TaskStatus_t;
 
 /* Possible return values for eTaskConfirmSleepModeStatus(). */
@@ -3050,6 +3053,11 @@ void vTaskInternalSetTimeOutState( TimeOut_t * const pxTimeOut ) PRIVILEGED_FUNC
 
 void vTaskMallocTrackHeapUsage(TaskHandle_t handle, uint32_t ulBytesUsed) PRIVILEGED_FUNCTION;
 void vTaskFreeTrackHeapUsage(TaskHandle_t handle, uint32_t ulBytesFreed) PRIVILEGED_FUNCTION;
+
+#if configTRACK_CPU_USAGE == 1
+void vTasklistCalculateCPULoad( List_t * pxList, eTaskState eState) PRIVILEGED_FUNCTION;
+void vTaskDoCPULoadCalculationLoop() PRIVILEGED_FUNCTION;
+#endif
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus

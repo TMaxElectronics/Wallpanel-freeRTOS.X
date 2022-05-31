@@ -37,4 +37,6 @@ uint32_t * SYS_makeCoherent(uint32_t * nonCoherent);
 uint32_t SYS_getCPULoadFine(TaskStatus_t * taskStats, uint32_t taskCount, uint32_t sysTime);
 const char * SYS_getTaskStateString(eTaskState state);
 
+void SYS_startCPULoadTask();
+
 #endif

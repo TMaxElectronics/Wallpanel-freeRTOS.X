@@ -67,3 +67,42 @@ const char * SYS_getTaskStateString(eTaskState state){
             return "invalid";
     }
 }
+
+static void SYS_cpuLoadTask(void * params){
+    uint32_t lastInstructionCount = portGET_INSTRUCTION_COUNTER_VALUE();
+    
+    while(1){
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDoCPULoadCalculationLoop();
+        /*uint32_t currInstructionCount = portGET_INSTRUCTION_COUNTER_VALUE();
+        uint32_t instructionsSinceLastTick = currInstructionCount - lastInstructionCount;
+        
+        
+        //allocate memory
+        uint32_t taskCount = uxTaskGetNumberOfTasks();
+        uint32_t sysTime;
+        TaskStatus_t * taskStats = pvPortMalloc( taskCount * sizeof( TaskStatus_t ));
+        
+        if(taskStats){
+            //load task info for all tasks
+            taskCount = uxTaskGetSystemState(taskStats, taskCount, &sysTime);
+            
+            //calculate load for each task
+            vTaskEnterCritical(); //we can't be interrupted by any task at this point, otherwise the instruction count would be significantly wrong
+            for(uint32_t currTask = 0;currTask < taskCount; currTask++){
+                //load = instrThisTask / totalInstrCount;
+                uint32_t cpuLoad = (1000 * taskStats->xHandle->ulInstructionsThisCycle) / instructionsSinceLastTick;
+                taskStats->xHandle->ulAvgCPULoad = (taskStats->xHandle->ulAvgCPULoad * 15 + cpuLoad) >> 4;
+                taskStats->xHandle->ulCurrentCPULoad = cpuLoad;
+                taskStats->xHandle->ulInstructionsThisCycle = 0;
+            }
+            vTaskExitCritical();
+            
+            vPortFree(taskStats);
+        }*/
+    }
+}
+
+void SYS_startCPULoadTask(){
+    xTaskCreate(SYS_cpuLoadTask, "CPU Load", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+}

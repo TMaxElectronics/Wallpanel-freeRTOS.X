@@ -31,6 +31,8 @@ void startServices(){
     
     prvSetupHardware();
     
+    SYS_startCPULoadTask();
+    
     TERM_addCommand(CMD_getBLState, "getBLState", "shows the last bootloader exit code", 0, &TERM_defaultList);
     
     SPI_HANDLE * sdCardHandle = SPI_createHandle(2);
