@@ -49,7 +49,7 @@
 #define configUSE_TICK_HOOK						1
 #define configTICK_RATE_HZ						( ( TickType_t ) 1000 )
 #define configCPU_CLOCK_HZ						( 200000000UL )
-#define configPERIPHERAL_CLOCK_HZ				( 40000000UL )
+#define configPERIPHERAL_CLOCK_HZ				( 100000000UL )
 #define configMAX_PRIORITIES					( 5UL )
 #define configMINIMAL_STACK_SIZE				( 190 )
 #define configISR_STACK_SIZE					( 400 )
@@ -73,8 +73,8 @@
 FPU context saving during switches only on architectures with hardware FPU.
 
 NOTE: This constant is defined in the project options as configurations are 
-provided that both enable and disable floating point support. 
-#define configUSE_TASK_FPU_SUPPORT				0 */
+provided that both enable and disable floating point support. */
+#define configUSE_TASK_FPU_SUPPORT				1
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES					0
@@ -122,7 +122,7 @@ interrupts. */
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY	0x03
 
 #define portGET_RUN_TIME_COUNTER_VALUE()	((TMR5 << 16) | TMR4)
-#define portGET_INSTRUCTION_COUNTER_VALUE()	_CP0_GET_COUNT()//((TMR5 << 16) | TMR4)
+#define portGET_INSTRUCTION_COUNTER_VALUE()	_CP0_GET_COUNT()*2//((TMR5 << 16) | TMR4)
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()	
     
 #endif /* FREERTOS_CONFIG_H */

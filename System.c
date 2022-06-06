@@ -15,6 +15,7 @@ const char SYS_fullBar[] = "====================================================
 const char SYS_emptyBar[] = "-------------------------------------------------------";
 const char * SYS_BOOTCODES[] = {"BOOTLOADER_EXIT_NOSD", "BOOTLOADER_EXIT_SD_INIT_FAIL", "BOOTLOADER_EXIT_NO_BOOTFILE", "BOOTLOADER_EXIT_INVALID_BOOTFILE", "BOOTLOADER_EXIT_UPDATE_COMPLETE"};
 
+StreamBufferHandle_t TERM_rxBuff;
 TERMINAL_HANDLE * TERM_handle = NULL;
 
 //a non scheduler dependent wait function. Used in exception handlers where no interrupts are enabled
@@ -34,7 +35,7 @@ uint32_t * SYS_makeCoherent(uint32_t * nonCoherent){
 //move a variable to the cachable section of ram
 uint32_t * SYS_makeNonCoherent(uint32_t * coherent){
     //make sure variable is in non coherent ram, else return NULL
-    if(coherent < KVA1_TO_KVA0(__KSEG0_DATA_MEM_BASE) || coherent >= KVA1_TO_KVA0(__KSEG0_DATA_MEM_BASE) + __KSEG0_DATA_MEM_LENGTH) return NULL;
+    if(coherent < KVA0_TO_KVA1(__KSEG0_DATA_MEM_BASE) || coherent >= KVA0_TO_KVA1(__KSEG0_DATA_MEM_BASE) + __KSEG0_DATA_MEM_LENGTH) return NULL;
     return KVA1_TO_KVA0(coherent);
 }
 
@@ -105,4 +106,16 @@ static void SYS_cpuLoadTask(void * params){
 
 void SYS_startCPULoadTask(){
     xTaskCreate(SYS_cpuLoadTask, "CPU Load", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+}
+
+uint32_t SYS_isInKSEG0RAM(void* ptr){
+    return ((ptr >= __KSEG0_DATA_MEM_BASE) && (ptr < (__KSEG0_DATA_MEM_BASE + __KSEG0_DATA_MEM_LENGTH)));
+}
+
+uint32_t SYS_isInKSEG1RAM(void* ptr){
+    return ((ptr >= KVA0_TO_KVA1(__KSEG0_DATA_MEM_BASE)) && (ptr < (KVA0_TO_KVA1(__KSEG0_DATA_MEM_BASE) + __KSEG0_DATA_MEM_LENGTH)));
+}
+
+uint32_t SYS_isInRAM(void* ptr){
+    return SYS_isInKSEG0RAM(ptr) || SYS_isInKSEG1RAM(ptr);
 }

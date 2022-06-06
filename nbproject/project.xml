@@ -31,10 +31,18 @@
                 <sourceRootElem>drivers/Pic32Uart/include</sourceRootElem>
                 <sourceRootElem>drivers/Pic32DMA</sourceRootElem>
                 <sourceRootElem>drivers/Pic32DMA/include</sourceRootElem>
+                <sourceRootElem>drivers/Display</sourceRootElem>
+                <sourceRootElem>drivers/Display/include</sourceRootElem>
+                <sourceRootElem>apps</sourceRootElem>
+                <sourceRootElem>apps/include</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>
                     <name>default</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>debug__no_optimization_</name>
                     <type>2</type>
                 </confElem>
             </confList>

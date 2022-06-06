@@ -40,7 +40,7 @@
 
 static const char top_sortingNamesPointers[][16] = {"none", "pid", "name", "CPU load", "total runtime", "stack usage", "heap usage"};
 
-uint8_t CMD_main(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
+static uint8_t CMD_main(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
 void TASK_main(void *pvParameters);
 uint8_t INPUT_handler(TERMINAL_HANDLE * handle, uint16_t c);
 
@@ -48,7 +48,7 @@ uint8_t REGISTER_top(TermCommandDescriptor * desc){
     TERM_addCommand(CMD_main, APP_NAME, APP_DESCRIPTION, 0, desc); 
 }
 
-uint8_t CMD_main(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
+static uint8_t CMD_main(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
     uint8_t currArg = 0;
     uint8_t returnCode = TERM_CMD_EXIT_SUCCESS;
     
@@ -174,7 +174,7 @@ void TASK_main(void *pvParameters){
             
             //new CPU load test
             ttprintf("%s%s%s", TERM_getVT100Code(_VT100_BACKGROUND_COLOR, _VT100_WHITE), TERM_getVT100Code(_VT100_ERASE_LINE_END, 0), TERM_getVT100Code(_VT100_FOREGROUND_COLOR, _VT100_BLACK));
-            ttprintf("PID \r\x1b[%dCName \r\x1b[%dCstate \r\x1b[%dC%%Cpu \r\x1b[%dCavg CPU  \r\x1b[%dCtime  \r\x1b[%dCStack \r\x1b[%dCHeap\r\n", 6
+            ttprintf("PID \r\x1b[%dCName \r\x1b[%dCstate \r\x1b[%dC%%Cpu \r\x1b[%dCavg %%CPU  \r\x1b[%dCtime  \r\x1b[%dCStack \r\x1b[%dCHeap\r\n", 6
                     , 7 + configMAX_TASK_NAME_LEN
                     , 20 + configMAX_TASK_NAME_LEN
                     , 27 + configMAX_TASK_NAME_LEN

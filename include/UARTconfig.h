@@ -1,5 +1,4 @@
 
 //#define UART_ALLOW_DEBUG
-#define MIN_MAX_PACKETSIZE 255
 
 #define UART_BUFFERSIZE 2048

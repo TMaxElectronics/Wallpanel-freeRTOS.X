@@ -34,6 +34,10 @@ uint32_t * SYS_makeNonCoherent(uint32_t * coherent);
 //move a variable to the non cachable section of ram
 uint32_t * SYS_makeCoherent(uint32_t * nonCoherent);
 
+uint32_t SYS_isInRAM(void* ptr);
+uint32_t SYS_isInKSEG0RAM(void* ptr);
+uint32_t SYS_isInKSEG1RAM(void* ptr);
+
 uint32_t SYS_getCPULoadFine(TaskStatus_t * taskStats, uint32_t taskCount, uint32_t sysTime);
 const char * SYS_getTaskStateString(eTaskState state);
 

@@ -26,6 +26,7 @@
 
 #include "tte.h"
 #include "string.h"
+#include "ff.h"
 
 #define APP_NAME "tte"
 #define APP_DESCRIPTION "editor"

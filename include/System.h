@@ -9,7 +9,7 @@
 #include "task.h"
 #include "TTerm.h"
 
-StreamBufferHandle_t TERM_rxBuff;
+extern StreamBufferHandle_t TERM_rxBuff;
 
 extern const char * SYS_BOOTCODES[];
 extern const char SYS_fullBar[];

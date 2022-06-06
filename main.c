@@ -66,8 +66,14 @@
 #include "ConfigPerformance.h"
 #include "LED.h"
 
+uint32_t config[16];
 
 int main( void ){
+    config[0] = _CP0_GET_CONFIG();
+    config[1] = _CP0_GET_CONFIG1();
+    config[2] = _CP0_GET_CONFIG2();
+    config[3] = _CP0_GET_CONFIG3();
+    config[4] = _CP0_GET_CONFIG4();
     startServices();
     
     vTaskStartScheduler();
@@ -100,6 +106,7 @@ void vApplicationTickHook( void ){
 }
 
 void _general_exception_handler( unsigned long ulCause, unsigned long ulStatus ){
+    uint32_t errorCode = (_CP0_GET_CAUSE() & 0x0000007C) >> 2;
     configASSERT(0);
     LED_showCode(LED_generalExceptionCode);
 }

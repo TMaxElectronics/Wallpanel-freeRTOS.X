@@ -16,6 +16,7 @@
 #include "SerialComms.h"
 #include "FS.h"
 #include "SPI.h"
+#include "Display.h"
 
 unsigned deviceReady = 0;
 static void startupTask();
@@ -42,6 +43,7 @@ void startServices(){
     //TODO optimize stack usage and figure out why it needs to be this large
     
     SCOM_init();
+    DISPLAY_init();
     
     //xTaskCreate(startupTask, "startTsk", configMINIMAL_STACK_SIZE, NULL , tskIDLE_PRIORITY + 2, NULL);
 }
@@ -95,8 +97,14 @@ static void prvSetupHardware(){
     TRISBCLR = _TRISB_TRISB2_MASK;
     
     CNPUASET = _TRISA_TRISA7_MASK;
-    CNPUBSET = _TRISB_TRISB0_MASK;
+    CNPUBSET = _TRISB_TRISB0_MASK | _TRISB_TRISB1_MASK | _TRISB_TRISB3_MASK;
     CNPUGSET = _TRISG_TRISG12_MASK | _TRISG_TRISG13_MASK | _TRISG_TRISG14_MASK | _TRISG_TRISG15_MASK;
+    
+    ANSELA = 0;
+    ANSELB = 0;
+    ANSELD = 0;
+    ANSELE = 0;
+    ANSELG = 0;
     
     T4CON = 0b1000000001111000;
     T5CON = 0b1000000001111000;

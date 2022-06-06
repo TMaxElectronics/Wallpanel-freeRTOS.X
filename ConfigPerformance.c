@@ -49,7 +49,7 @@ void vHardwareConfigurePerformance( void )
 	SYSKEY = hwUNLOCK_KEY_1;
 
 	/* 200MHz / 5 = 40MHz */
-	PB2DIVbits.PBDIV = 0b100;
+	PB2DIVbits.PBDIV = 1;
 
 	/* Timers use clock PBCLK3, set this to 40MHz. */
 	PB3DIVbits.PBDIV = 0b100;
