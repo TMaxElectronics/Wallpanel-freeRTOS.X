@@ -67,6 +67,11 @@
         </logicalFolder>
         <itemPath>TTerm/TTerm_config.h</itemPath>
       </logicalFolder>
+      <logicalFolder name="f6" displayName=".utils" projectFiles="true">
+        <logicalFolder name="f1" displayName="DLL" projectFiles="true">
+          <itemPath>utils/DLL/include/DLL.h</itemPath>
+        </logicalFolder>
+      </logicalFolder>
       <logicalFolder name="f3" displayName="apps" projectFiles="true">
         <itemPath>apps/include/apps.h</itemPath>
         <itemPath>apps/include/top.h</itemPath>
@@ -90,6 +95,7 @@
       <logicalFolder name="f5" displayName=".drivers" projectFiles="true">
         <logicalFolder name="f5" displayName="display" projectFiles="true">
           <itemPath>drivers/Display/Display.c</itemPath>
+          <itemPath>drivers/Display/graphics.c</itemPath>
         </logicalFolder>
         <logicalFolder name="f4" displayName="DMA" projectFiles="true">
           <itemPath>drivers/Pic32DMA/DMA.c</itemPath>
@@ -136,6 +142,11 @@
           <itemPath>TTerm/Core/TTerm_cwd.c</itemPath>
         </logicalFolder>
       </logicalFolder>
+      <logicalFolder name="f6" displayName=".utils" projectFiles="true">
+        <logicalFolder name="f1" displayName="DLL" projectFiles="true">
+          <itemPath>utils/DLL/DLL.c</itemPath>
+        </logicalFolder>
+      </logicalFolder>
       <logicalFolder name="f4" displayName="apps" projectFiles="true">
         <itemPath>apps/apps.c</itemPath>
         <itemPath>apps/top.c</itemPath>
@@ -178,6 +189,8 @@
     <Elem>drivers/Display/include</Elem>
     <Elem>apps</Elem>
     <Elem>apps/include</Elem>
+    <Elem>utils/DLL</Elem>
+    <Elem>utils/DLL/include</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -231,7 +244,7 @@
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
         <property key="extra-include-directories"
-                  value="include;THex;FreeRTOS\Core\include;FreeRTOS\Core\portable\MPLAB\PIC32MZ;FreeRTOS\Core;TTerm\Core\include;TTerm;RTOSFs\include;drivers\Pic32FastSd\include;drivers\Pic32Spi\include;drivers\Pic32Uart\include;drivers\Pic32DMA\include;drivers\Display\include;apps\include"/>
+                  value="include;THex;FreeRTOS\Core\include;FreeRTOS\Core\portable\MPLAB\PIC32MZ;FreeRTOS\Core;TTerm\Core\include;TTerm;RTOSFs\include;drivers\Pic32FastSd\include;drivers\Pic32Spi\include;drivers\Pic32Uart\include;drivers\Pic32DMA\include;drivers\Display\include;apps\include;utils\DLL\include"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="false"/>
@@ -946,7 +959,7 @@
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
         <property key="extra-include-directories"
-                  value="include;THex;FreeRTOS\Core\include;FreeRTOS\Core\portable\MPLAB\PIC32MZ;FreeRTOS\Core;TTerm\Core\include;TTerm;RTOSFs\include;drivers\Pic32FastSd\include;drivers\Pic32Spi\include;drivers\Pic32Uart\include;drivers\Pic32DMA\include;drivers\Display\include;apps\include"/>
+                  value="include;THex;FreeRTOS\Core\include;FreeRTOS\Core\portable\MPLAB\PIC32MZ;FreeRTOS\Core;TTerm\Core\include;TTerm;RTOSFs\include;drivers\Pic32FastSd\include;drivers\Pic32Spi\include;drivers\Pic32Uart\include;drivers\Pic32DMA\include;drivers\Display\include;apps\include;utils\DLL\include"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="false"/>
@@ -1481,6 +1494,12 @@
         <C32Global>
         </C32Global>
       </item>
+      <item path="drivers/Pic32FastSd/ff_extensions.c" ex="true" overriding="false">
+      </item>
+      <item path="drivers/Pic32FastSd/include/ff_extensions.h"
+            ex="true"
+            overriding="false">
+      </item>
       <item path="drivers/Pic32Uart/include/printf.h" ex="true" overriding="false">
         <C32>
         </C32>
@@ -1611,7 +1630,7 @@
         <property key="memories.programmemory.ranges" value="1d000000-1d0fffff"/>
         <property key="poweroptions.powerenable" value="false"/>
         <property key="programmerToGoFilePath"
-                  value="C:/Users/Thorb/OneDrive/MPLab Projects/Wallpanel freeRTOS.X/debug/default/Wallpanel freeRTOS_ptg"/>
+                  value="C:/Users/Thorb/OneDrive/MPLab Projects/Wallpanel freeRTOS.X/debug/debug__no_optimization_/Wallpanel freeRTOS_ptg"/>
         <property key="programmerToGoImageName" value="Wallpanel freeRTOS_ptg"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>

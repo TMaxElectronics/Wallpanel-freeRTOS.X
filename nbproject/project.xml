@@ -35,6 +35,8 @@
                 <sourceRootElem>drivers/Display/include</sourceRootElem>
                 <sourceRootElem>apps</sourceRootElem>
                 <sourceRootElem>apps/include</sourceRootElem>
+                <sourceRootElem>utils/DLL</sourceRootElem>
+                <sourceRootElem>utils/DLL/include</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>

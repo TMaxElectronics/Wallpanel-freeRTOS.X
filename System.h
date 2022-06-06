@@ -43,4 +43,6 @@ const char * SYS_getTaskStateString(eTaskState state);
 
 void SYS_startCPULoadTask();
 
+void SYS_randFill(uint8_t * data, uint32_t length);
+
 #endif

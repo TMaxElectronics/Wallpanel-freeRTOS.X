@@ -16,3 +16,6 @@
 [submodule "drivers/Pic32Spi"]
 	path = drivers/Pic32Spi
 	url = http://github.com/TMaxElectronics/Pic32Spi.git
+[submodule "utils/DLL"]
+	path = utils/DLL
+	url = https://github.com/TMaxElectronics/DLL.git

@@ -28,14 +28,14 @@ void SYS_waitCP0(uint16_t length){
 //move a variable to the non cachable section of ram
 uint32_t * SYS_makeCoherent(uint32_t * nonCoherent){
     //make sure variable is in non coherent ram, else return NULL
-    if(nonCoherent < __KSEG0_DATA_MEM_BASE || nonCoherent >= __KSEG0_DATA_MEM_BASE + __KSEG0_DATA_MEM_LENGTH) return NULL;
+    if(nonCoherent < __KSEG0_DATA_MEM_BASE || nonCoherent >= __KSEG0_DATA_MEM_BASE + __KSEG0_DATA_MEM_LENGTH) return nonCoherent;
     return KVA0_TO_KVA1(nonCoherent);
 }
 
 //move a variable to the cachable section of ram
 uint32_t * SYS_makeNonCoherent(uint32_t * coherent){
     //make sure variable is in non coherent ram, else return NULL
-    if(coherent < KVA0_TO_KVA1(__KSEG0_DATA_MEM_BASE) || coherent >= KVA0_TO_KVA1(__KSEG0_DATA_MEM_BASE) + __KSEG0_DATA_MEM_LENGTH) return NULL;
+    if(coherent < KVA0_TO_KVA1(__KSEG0_DATA_MEM_BASE) || coherent >= KVA0_TO_KVA1(__KSEG0_DATA_MEM_BASE) + __KSEG0_DATA_MEM_LENGTH) return coherent;
     return KVA1_TO_KVA0(coherent);
 }
 
@@ -118,4 +118,10 @@ uint32_t SYS_isInKSEG1RAM(void* ptr){
 
 uint32_t SYS_isInRAM(void* ptr){
     return SYS_isInKSEG0RAM(ptr) || SYS_isInKSEG1RAM(ptr);
+}
+
+void SYS_randFill(uint8_t *data, uint32_t length){
+    for(uint32_t i = 0; i < length; i++){
+        data[i] = _CP0_GET_RANDOM();
+    }
 }
